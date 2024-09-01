@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Protocolo Noruego</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5AC8FA;
+            --background-color: #F2F2F7;
+            --text-color: #1C1C1E;
+            --card-background: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            font-weight: 600;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D1D6;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block;
+            margin-top: 10px;
+        }
+
+        button:active {
+            background-color: var(--secondary-color);
+        }
+
+        #timer-display {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #phase-display {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #E5E5EA;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 1s linear;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #explanation {
+            margin-top: 40px;
+        }
+
+        .icon {
+            margin-right: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-running icon"></i>Protocolo Noruego</h1>
+        
+        <div class="card">
+            <form id="workout-form">
+                <div class="input-group">
+                    <label for="warmup">Calentamiento (minutos):</label>
+                    <input type="number" id="warmup" name="warmup" min="0" value="5">
+                </div>
+                <div class="input-group">
+                    <label for="cooldown">Enfriamiento (minutos):</label>
+                    <input type="number" id="cooldown" name="cooldown" min="0" value="5">
+                </div>
+                <button type="submit">Configurar Entrenamiento</button>
+            </form>
+        </div>
+
+        <div id="workout-display" class="card hidden">
+            <h2><i class="fas fa-clipboard-list icon"></i>Tu Entrenamiento</h2>
+            <div id="workout-plan"></div>
+            <button id="start-workout">Comenzar</button>
+        </div>
+
+        <div id="timer-section" class="card hidden">
+            <div id="phase-display"></div>
+            <div id="timer-display"></div>
+            <div class="progress-bar">
+                <div class="progress" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="explanation" class="card">
+            <h2><i class="fas fa-info-circle icon"></i>Acerca del Protocolo Noruego</h2>
+            <p>El Protocolo Noruego es un método de entrenamiento de alta intensidad que consiste en 4 ciclos de actividad intensa seguidos por períodos de recuperación.</p>
+            <h3>Beneficios:</h3>
+            <ul>
+                <li><i class="fas fa-heart icon"></i>Mejora la capacidad aeróbica</li>
+                <li><i class="fas fa-heartbeat icon"></i>Aumenta la resistencia cardiovascular</li>
+                <li><i class="fas fa-fire icon"></i>Quema eficiente de calorías</li>
+                <li><i class="fas fa-clock icon"></i>Ahorra tiempo comparado con entrenamientos tradicionales</li>
+                <li><i class="fas fa-dumbbell icon"></i>Adaptable a diferentes niveles de condición física</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const workoutForm = document.getElementById('workout-form');
+        const workoutDisplay = document.getElementById('workout-display');
+        const timerSection = document.getElementById('timer-section');
+        const startWorkoutBtn = document.getElementById('start-workout');
+        const timerDisplay = document.getElementById('timer-display');
+        const phaseDisplay = document.getElementById('phase-display');
+        const progressBar = document.getElementById('progress-bar');
+
+        workoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const warmup = parseInt(document.getElementById('warmup').value);
+            const cooldown = parseInt(document.getElementById('cooldown').value);
+            
+            let workoutPlan = `
+                <p><i class="fas fa-fire-alt icon"></i>Calentamiento: ${warmup} minutos</p>
+                <p><i class="fas fa-sync icon"></i>4 ciclos de:</p>
+                <ul>
+                    <li><i class="fas fa-bolt icon"></i>Actividad intensa: 4 minutos</li>
+                    <li><i class="fas fa-bed icon"></i>Recuperación: 3 minutos</li>
+                </ul>
+                <p><i class="fas fa-wind icon"></i>Enfriamiento: ${cooldown} minutos</p>
+            `;
+            
+            document.getElementById('workout-plan').innerHTML = workoutPlan;
+            workoutDisplay.classList.remove('hidden');
+        });
+
+        startWorkoutBtn.addEventListener('click', function() {
+            workoutDisplay.classList.add('hidden');
+            timerSection.classList.remove('hidden');
+            
+            const warmup = parseInt(document.getElementById('warmup').value);
+            const cooldown = parseInt(document.getElementById('cooldown').value);
+            let totalTime = warmup * 60 + 4 * (4 * 60 + 3 * 60) + cooldown * 60;
+            const originalTotalTime = totalTime;
+            let currentPhase = 'Calentamiento';
+            let phaseTime = warmup * 60;
+            let phaseOriginalTime = phaseTime;
+
+            function updateTimer() {
+                if (totalTime <= 0) {
+                    clearInterval(timer);
+                    phaseDisplay.textContent = '¡Entrenamiento completado!';
+                    timerDisplay.textContent = '00:00';
+                    progressBar.style.width = '100%';
+                    return;
+                }
+
+                if (phaseTime <= 0) {
+                    if (currentPhase === 'Calentamiento') {
+                        currentPhase = 'Actividad intensa';
+                        phaseTime = 4 * 60;
+                    } else if (currentPhase === 'Actividad intensa') {
+                        currentPhase = 'Recuperación';
+                        phaseTime = 3 * 60;
+                    } else if (currentPhase === 'Recuperación') {
+                        currentPhase = 'Actividad intensa';
+                        phaseTime = 4 * 60;
+                    }
+
+                    if (totalTime <= cooldown * 60) {
+                        currentPhase = 'Enfriamiento';
+                        phaseTime = cooldown * 60;
+                    }
+                    phaseOriginalTime = phaseTime;
+                }
+
+                const minutes = Math.floor(totalTime / 60);
+                const seconds = totalTime % 60;
+                phaseDisplay.textContent = currentPhase;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                const progress = ((originalTotalTime - totalTime) / originalTotalTime) * 100;
+                progressBar.style.width = `${progress}%`;
+
+                totalTime--;
+                phaseTime--;
+            }
+
+            updateTimer();
+            const timer = setInterval(updateTimer, 1000);
+        });
+    </script>
+</body>
+</html>
