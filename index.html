@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Protocolo Noruego</title>
+    <title>Protocolo Noruego Mejorado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -12,6 +12,10 @@
             --background-color: #F2F2F7;
             --text-color: #1C1C1E;
             --card-background: #FFFFFF;
+            --warmup-color: #4CD964;
+            --interval-color: #FF3B30;
+            --recovery-color: #5AC8FA;
+            --cooldown-color: #FF9500;
         }
 
         * {
@@ -95,6 +99,9 @@
             font-weight: 600;
             text-align: center;
             margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
         }
 
         .progress-bar {
@@ -109,7 +116,6 @@
         .progress {
             width: 0%;
             height: 100%;
-            background-color: var(--primary-color);
             transition: width 1s linear;
         }
 
@@ -125,6 +131,12 @@
             margin-right: 10px;
         }
 
+        #next-phase {
+            font-size: 16px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
         @media (min-width: 768px) {
             .container {
                 max-width: 600px;
@@ -134,17 +146,17 @@
 </head>
 <body>
     <div class="container">
-        <h1><i class="fas fa-running icon"></i>Protocolo Noruego</h1>
+        <h1><i class="fas fa-running icon"></i>Protocolo Noruego Mejorado</h1>
         
         <div class="card">
             <form id="workout-form">
                 <div class="input-group">
                     <label for="warmup">Calentamiento (minutos):</label>
-                    <input type="number" id="warmup" name="warmup" min="0" value="5">
+                    <input type="number" id="warmup" name="warmup" min="0" value="10" required>
                 </div>
                 <div class="input-group">
                     <label for="cooldown">Enfriamiento (minutos):</label>
-                    <input type="number" id="cooldown" name="cooldown" min="0" value="5">
+                    <input type="number" id="cooldown" name="cooldown" min="0" value="5" required>
                 </div>
                 <button type="submit">Configurar Entrenamiento</button>
             </form>
@@ -162,11 +174,12 @@
             <div class="progress-bar">
                 <div class="progress" id="progress-bar"></div>
             </div>
+            <div id="next-phase"></div>
         </div>
 
         <div id="explanation" class="card">
             <h2><i class="fas fa-info-circle icon"></i>Acerca del Protocolo Noruego</h2>
-            <p>El Protocolo Noruego es un método de entrenamiento de alta intensidad que consiste en 4 ciclos de actividad intensa seguidos por períodos de recuperación.</p>
+            <p>El Protocolo Noruego es un método de entrenamiento de alta intensidad que consiste en 3 ciclos de actividad intensa seguidos por períodos de recuperación.</p>
             <h3>Beneficios:</h3>
             <ul>
                 <li><i class="fas fa-heart icon"></i>Mejora la capacidad aeróbica</li>
@@ -186,6 +199,7 @@
         const timerDisplay = document.getElementById('timer-display');
         const phaseDisplay = document.getElementById('phase-display');
         const progressBar = document.getElementById('progress-bar');
+        const nextPhaseDisplay = document.getElementById('next-phase');
 
         workoutForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -194,7 +208,7 @@
             
             let workoutPlan = `
                 <p><i class="fas fa-fire-alt icon"></i>Calentamiento: ${warmup} minutos</p>
-                <p><i class="fas fa-sync icon"></i>4 ciclos de:</p>
+                <p><i class="fas fa-sync icon"></i>3 ciclos de:</p>
                 <ul>
                     <li><i class="fas fa-bolt icon"></i>Actividad intensa: 4 minutos</li>
                     <li><i class="fas fa-bed icon"></i>Recuperación: 3 minutos</li>
@@ -212,18 +226,21 @@
             
             const warmup = parseInt(document.getElementById('warmup').value);
             const cooldown = parseInt(document.getElementById('cooldown').value);
-            let totalTime = warmup * 60 + 4 * (4 * 60 + 3 * 60) + cooldown * 60;
+            let totalTime = warmup * 60 + 3 * (4 * 60 + 3 * 60) + cooldown * 60;
             const originalTotalTime = totalTime;
             let currentPhase = 'Calentamiento';
             let phaseTime = warmup * 60;
             let phaseOriginalTime = phaseTime;
+            let cycleCount = 0;
 
             function updateTimer() {
                 if (totalTime <= 0) {
                     clearInterval(timer);
                     phaseDisplay.textContent = '¡Entrenamiento completado!';
+                    phaseDisplay.style.backgroundColor = '#4CD964';
                     timerDisplay.textContent = '00:00';
                     progressBar.style.width = '100%';
+                    nextPhaseDisplay.textContent = '';
                     return;
                 }
 
@@ -231,28 +248,61 @@
                     if (currentPhase === 'Calentamiento') {
                         currentPhase = 'Actividad intensa';
                         phaseTime = 4 * 60;
+                        cycleCount++;
                     } else if (currentPhase === 'Actividad intensa') {
                         currentPhase = 'Recuperación';
                         phaseTime = 3 * 60;
                     } else if (currentPhase === 'Recuperación') {
-                        currentPhase = 'Actividad intensa';
-                        phaseTime = 4 * 60;
+                        if (cycleCount < 3) {
+                            currentPhase = 'Actividad intensa';
+                            phaseTime = 4 * 60;
+                            cycleCount++;
+                        } else {
+                            currentPhase = 'Enfriamiento';
+                            phaseTime = cooldown * 60;
+                        }
                     }
 
-                    if (totalTime <= cooldown * 60) {
-                        currentPhase = 'Enfriamiento';
-                        phaseTime = cooldown * 60;
-                    }
                     phaseOriginalTime = phaseTime;
                 }
 
                 const minutes = Math.floor(totalTime / 60);
                 const seconds = totalTime % 60;
-                phaseDisplay.textContent = currentPhase;
+                phaseDisplay.textContent = `${currentPhase} (Ciclo ${cycleCount}/3)`;
                 timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                // Update phase display color
+                switch (currentPhase) {
+                    case 'Calentamiento':
+                        phaseDisplay.style.backgroundColor = 'var(--warmup-color)';
+                        break;
+                    case 'Actividad intensa':
+                        phaseDisplay.style.backgroundColor = 'var(--interval-color)';
+                        break;
+                    case 'Recuperación':
+                        phaseDisplay.style.backgroundColor = 'var(--recovery-color)';
+                        break;
+                    case 'Enfriamiento':
+                        phaseDisplay.style.backgroundColor = 'var(--cooldown-color)';
+                        break;
+                }
 
                 const progress = ((originalTotalTime - totalTime) / originalTotalTime) * 100;
                 progressBar.style.width = `${progress}%`;
+                progressBar.style.backgroundColor = phaseDisplay.style.backgroundColor;
+
+                // Update next phase display
+                let nextPhase = '';
+                if (currentPhase === 'Calentamiento') nextPhase = 'Actividad intensa';
+                else if (currentPhase === 'Actividad intensa') nextPhase = 'Recuperación';
+                else if (currentPhase === 'Recuperación' && cycleCount < 3) nextPhase = 'Actividad intensa';
+                else if (currentPhase === 'Recuperación' && cycleCount === 3) nextPhase = 'Enfriamiento';
+                
+                if (nextPhase) {
+                    nextPhaseDisplay.textContent = `Siguiente: ${nextPhase}`;
+                } else {
+                    nextPhaseDisplay.textContent = '';
+                }
 
                 totalTime--;
                 phaseTime--;
