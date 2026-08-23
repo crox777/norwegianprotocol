@@ -1,316 +1,974 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Protocolo Noruego Mejorado</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #007AFF;
-            --secondary-color: #5AC8FA;
-            --background-color: #F2F2F7;
-            --text-color: #1C1C1E;
-            --card-background: #FFFFFF;
-            --warmup-color: #4CD964;
-            --interval-color: #FF3B30;
-            --recovery-color: #5AC8FA;
-            --cooldown-color: #FF9500;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0c10">
+  <title>Norwegian 4×4</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0c10;
+      --surface: #14161c;
+      --surface-2: #1b1e25;
+      --border: rgba(255,255,255,.09);
+      --text: #f7f7f8;
+      --muted: #9498a3;
+      --subtle: #656a76;
+      --work: #ff4b55;
+      --recovery: #54bfff;
+      --warmup: #58d68d;
+      --cooldown: #ffad42;
+      --accent: #ff4b55;
+      --track: rgba(255,255,255,.08);
+      --shadow: 0 22px 60px rgba(0,0,0,.28);
+    }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+    * { box-sizing: border-box; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
+    html { background: var(--bg); }
 
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            margin: 0 auto;
-        }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 50% -15%, rgba(255,75,85,.14), transparent 34rem),
+        var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
 
-        h1, h2 {
-            font-weight: 600;
-        }
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
 
-        .card {
-            background-color: var(--card-background);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    .app {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: max(24px, env(safe-area-inset-top)) 18px max(30px, env(safe-area-inset-bottom));
+    }
 
-        .input-group {
-            margin-bottom: 15px;
-        }
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 8vw, 54px);
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #D1D1D6;
-            border-radius: 8px;
-            font-size: 16px;
-        }
+    .lede {
+      max-width: 560px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
 
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: block;
-            margin-top: 10px;
-        }
+    .protocol-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 22px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,75,85,.26);
+      border-radius: 999px;
+      background: rgba(255,75,85,.08);
+      color: #ff8c93;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
 
-        button:active {
-            background-color: var(--secondary-color);
-        }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 14px currentColor;
+    }
 
-        #timer-display {
-            font-size: 48px;
-            font-weight: 700;
-            text-align: center;
-            margin: 20px 0;
-        }
+    .card {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.035), transparent), var(--surface);
+      box-shadow: var(--shadow);
+    }
 
-        #phase-display {
-            font-size: 24px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
+    .protocol-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+    }
 
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background-color: #E5E5EA;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
+    .stat {
+      min-height: 88px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface-2);
+    }
 
-        .progress {
-            width: 0%;
-            height: 100%;
-            transition: width 1s linear;
-        }
+    .stat strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 25px;
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
 
-        .hidden {
-            display: none;
-        }
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
 
-        #explanation {
-            margin-top: 40px;
-        }
+    .timeline {
+      display: grid;
+      grid-template-columns: 4fr 3fr 4fr 3fr 4fr 3fr 4fr;
+      gap: 5px;
+      margin: 18px 0 8px;
+      align-items: stretch;
+    }
 
-        .icon {
-            margin-right: 10px;
-        }
+    .timeline span {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+    }
 
-        #next-phase {
-            font-size: 16px;
-            text-align: center;
-            margin-top: 10px;
-        }
+    .timeline .work { background: rgba(255,75,85,.16); color: #ff8c93; }
+    .timeline .recovery { background: rgba(84,191,255,.13); color: #8ed6ff; }
 
-        @media (min-width: 768px) {
-            .container {
-                max-width: 600px;
-            }
-        }
-    </style>
+    .timeline-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--subtle);
+      font-size: 11px;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .setting {
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .setting-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: 38px 1fr 38px;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .stepper button {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 19px;
+    }
+
+    .stepper button:active { transform: scale(.96); }
+
+    .stepper input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      text-align: center;
+      font-size: 22px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      appearance: textfield;
+    }
+
+    .stepper input::-webkit-inner-spin-button { display: none; }
+
+    .setting-unit {
+      margin-top: 3px;
+      color: var(--subtle);
+      text-align: center;
+      font-size: 10px;
+    }
+
+    .start-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .duration-block span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .duration-block strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 19px;
+      letter-spacing: -.02em;
+    }
+
+    .primary,
+    .secondary {
+      border: 0;
+      border-radius: 16px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .primary {
+      min-height: 52px;
+      padding: 0 22px;
+      background: var(--text);
+      color: #111216;
+      box-shadow: 0 10px 30px rgba(255,255,255,.08);
+    }
+
+    .primary:active, .secondary:active { transform: scale(.98); }
+
+    .how-to {
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    details summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    details p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Workout */
+    .workout-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .phase-kicker {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .phase-name {
+      margin-top: 2px;
+      font-size: 24px;
+      font-weight: 850;
+      letter-spacing: -.03em;
+    }
+
+    .phase-badge {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 13%, transparent);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .timer-shell {
+      display: grid;
+      place-items: center;
+      padding: 8px 0 14px;
+    }
+
+    .timer-ring {
+      --phase-progress: 0;
+      width: min(68vw, 290px);
+      aspect-ratio: 1;
+      padding: 9px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) calc(var(--phase-progress) * 1turn), var(--track) 0);
+      box-shadow: 0 0 48px color-mix(in srgb, var(--accent) 13%, transparent);
+      transition: background .25s linear, box-shadow .25s ease;
+    }
+
+    .timer-face {
+      display: grid;
+      place-content: center;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 36%, rgba(255,255,255,.045), transparent 46%), #101218;
+      text-align: center;
+    }
+
+    #timer-display {
+      font-size: clamp(56px, 15vw, 82px);
+      font-weight: 780;
+      line-height: .95;
+      letter-spacing: -.055em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #timer-subtitle {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rounds {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-top: 4px;
+    }
+
+    .round {
+      position: relative;
+      overflow: hidden;
+      padding: 11px 8px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.025);
+      color: var(--subtle);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .round.current {
+      border-color: color-mix(in srgb, var(--work) 45%, transparent);
+      background: rgba(255,75,85,.10);
+      color: #ff8c93;
+    }
+
+    .round.complete {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+
+    .overall {
+      margin-top: 16px;
+    }
+
+    .overall-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .overall-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--track);
+    }
+
+    #overall-progress {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width .25s linear, background .2s ease;
+    }
+
+    .next-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 15px;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .next-card span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .next-card strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .target {
+      color: var(--muted);
+      text-align: right;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .secondary {
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .secondary.danger {
+      color: #ff7d85;
+      background: rgba(255,75,85,.07);
+      border-color: rgba(255,75,85,.15);
+    }
+
+    .complete-panel {
+      text-align: center;
+      padding: 22px 8px 4px;
+    }
+
+    .complete-panel .check {
+      display: grid;
+      place-items: center;
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(88,214,141,.12);
+      color: var(--warmup);
+      font-size: 28px;
+    }
+
+    .complete-panel h2 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: -.035em;
+    }
+
+    .complete-panel p {
+      margin: 8px auto 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 520px) {
+      .app { padding-inline: 14px; }
+      .card { padding: 16px; border-radius: 21px; }
+      .start-row { align-items: stretch; flex-direction: column; }
+      .primary { width: 100%; }
+      .timeline { gap: 3px; }
+      .timeline span { height: 34px; border-radius: 8px; font-size: 10px; }
+      .settings { grid-template-columns: 1fr 1fr; }
+      .controls { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1><i class="fas fa-running icon"></i>Protocolo Noruego Mejorado</h1>
-        
-        <div class="card">
-            <form id="workout-form">
-                <div class="input-group">
-                    <label for="warmup">Calentamiento (minutos):</label>
-                    <input type="number" id="warmup" name="warmup" min="0" value="10" required>
-                </div>
-                <div class="input-group">
-                    <label for="cooldown">Enfriamiento (minutos):</label>
-                    <input type="number" id="cooldown" name="cooldown" min="0" value="5" required>
-                </div>
-                <button type="submit">Configurar Entrenamiento</button>
-            </form>
+  <main class="app">
+    <section id="setup-screen">
+      <p class="eyebrow">Entrenamiento de VO₂ máx</p>
+      <h1>Norwegian 4×4</h1>
+      <p class="lede">Cuatro intervalos de 4 minutos, separados por 3 minutos de recuperación activa. Sin variantes, sin decisiones innecesarias.</p>
+      <div class="protocol-mark"><span class="dot"></span> Protocolo 4×4</div>
+
+      <div class="card">
+        <div class="protocol-grid">
+          <div class="stat">
+            <strong>4 × 4:00</strong>
+            <span>trabajo intenso</span>
+          </div>
+          <div class="stat">
+            <strong>3 × 3:00</strong>
+            <span>recuperación activa</span>
+          </div>
         </div>
 
-        <div id="workout-display" class="card hidden">
-            <h2><i class="fas fa-clipboard-list icon"></i>Tu Entrenamiento</h2>
-            <div id="workout-plan"></div>
-            <button id="start-workout">Comenzar</button>
+        <div class="timeline" aria-label="Secuencia de intervalos">
+          <span class="work">4</span><span class="recovery">3</span>
+          <span class="work">4</span><span class="recovery">3</span>
+          <span class="work">4</span><span class="recovery">3</span>
+          <span class="work">4</span>
+        </div>
+        <div class="timeline-caption">
+          <span>Trabajo</span>
+          <span>3 recuperaciones entre 4 intervalos</span>
         </div>
 
-        <div id="timer-section" class="card hidden">
-            <div id="phase-display"></div>
-            <div id="timer-display"></div>
-            <div class="progress-bar">
-                <div class="progress" id="progress-bar"></div>
+        <div class="settings">
+          <div class="setting">
+            <span class="setting-label">Calentamiento</span>
+            <div class="stepper">
+              <button type="button" data-step="warmup" data-delta="-1" aria-label="Reducir calentamiento">−</button>
+              <input id="warmup" type="number" min="0" max="30" value="10" inputmode="numeric" aria-label="Minutos de calentamiento">
+              <button type="button" data-step="warmup" data-delta="1" aria-label="Aumentar calentamiento">+</button>
             </div>
-            <div id="next-phase"></div>
+            <div class="setting-unit">minutos</div>
+          </div>
+
+          <div class="setting">
+            <span class="setting-label">Enfriamiento</span>
+            <div class="stepper">
+              <button type="button" data-step="cooldown" data-delta="-1" aria-label="Reducir enfriamiento">−</button>
+              <input id="cooldown" type="number" min="0" max="30" value="5" inputmode="numeric" aria-label="Minutos de enfriamiento">
+              <button type="button" data-step="cooldown" data-delta="1" aria-label="Aumentar enfriamiento">+</button>
+            </div>
+            <div class="setting-unit">minutos</div>
+          </div>
         </div>
 
-        <div id="explanation" class="card">
-            <h2><i class="fas fa-info-circle icon"></i>Acerca del Protocolo Noruego</h2>
-            <p>El Protocolo Noruego es un método de entrenamiento de alta intensidad que consiste en 3 ciclos de actividad intensa seguidos por períodos de recuperación.</p>
-            <h3>Beneficios:</h3>
-            <ul>
-                <li><i class="fas fa-heart icon"></i>Mejora la capacidad aeróbica</li>
-                <li><i class="fas fa-heartbeat icon"></i>Aumenta la resistencia cardiovascular</li>
-                <li><i class="fas fa-fire icon"></i>Quema eficiente de calorías</li>
-                <li><i class="fas fa-clock icon"></i>Ahorra tiempo comparado con entrenamientos tradicionales</li>
-                <li><i class="fas fa-dumbbell icon"></i>Adaptable a diferentes niveles de condición física</li>
-            </ul>
+        <div class="start-row">
+          <div class="duration-block">
+            <span>Duración total</span>
+            <strong id="total-duration">40 min</strong>
+          </div>
+          <button id="start-workout" class="primary" type="button">Comenzar 4×4</button>
         </div>
-    </div>
 
-    <script>
-        const workoutForm = document.getElementById('workout-form');
-        const workoutDisplay = document.getElementById('workout-display');
-        const timerSection = document.getElementById('timer-section');
-        const startWorkoutBtn = document.getElementById('start-workout');
-        const timerDisplay = document.getElementById('timer-display');
-        const phaseDisplay = document.getElementById('phase-display');
-        const progressBar = document.getElementById('progress-bar');
-        const nextPhaseDisplay = document.getElementById('next-phase');
+        <div class="how-to">
+          <details>
+            <summary>Cómo ejecutar el 4×4</summary>
+            <p>Tras el calentamiento, completa 4 minutos de trabajo intenso, luego 3 minutos de recuperación activa. Repite hasta completar cuatro intervalos de trabajo. Como referencia, el trabajo suele apuntar aproximadamente al 85–95% de la frecuencia cardiaca máxima, sin necesidad de alcanzar esa zona en el primer minuto.</p>
+          </details>
+        </div>
+      </div>
+    </section>
 
-        workoutForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const warmup = parseInt(document.getElementById('warmup').value);
-            const cooldown = parseInt(document.getElementById('cooldown').value);
-            
-            let workoutPlan = `
-                <p><i class="fas fa-fire-alt icon"></i>Calentamiento: ${warmup} minutos</p>
-                <p><i class="fas fa-sync icon"></i>3 ciclos de:</p>
-                <ul>
-                    <li><i class="fas fa-bolt icon"></i>Actividad intensa: 4 minutos</li>
-                    <li><i class="fas fa-bed icon"></i>Recuperación: 3 minutos</li>
-                </ul>
-                <p><i class="fas fa-wind icon"></i>Enfriamiento: ${cooldown} minutos</p>
-            `;
-            
-            document.getElementById('workout-plan').innerHTML = workoutPlan;
-            workoutDisplay.classList.remove('hidden');
-        });
+    <section id="workout-screen" class="hidden" aria-live="polite">
+      <div class="card">
+        <div class="workout-header">
+          <div>
+            <div class="phase-kicker" id="phase-kicker">Ahora</div>
+            <div class="phase-name" id="phase-name">Calentamiento</div>
+          </div>
+          <div class="phase-badge" id="phase-badge">10:00</div>
+        </div>
 
-        startWorkoutBtn.addEventListener('click', function() {
-            workoutDisplay.classList.add('hidden');
-            timerSection.classList.remove('hidden');
-            
-            const warmup = parseInt(document.getElementById('warmup').value);
-            const cooldown = parseInt(document.getElementById('cooldown').value);
-            let totalTime = warmup * 60 + 3 * (4 * 60 + 3 * 60) + cooldown * 60;
-            const originalTotalTime = totalTime;
-            let currentPhase = 'Calentamiento';
-            let phaseTime = warmup * 60;
-            let phaseOriginalTime = phaseTime;
-            let cycleCount = 0;
+        <div class="timer-shell">
+          <div class="timer-ring" id="timer-ring">
+            <div class="timer-face">
+              <div id="timer-display">10:00</div>
+              <div id="timer-subtitle">tiempo de esta fase</div>
+            </div>
+          </div>
+        </div>
 
-            function updateTimer() {
-                if (totalTime <= 0) {
-                    clearInterval(timer);
-                    phaseDisplay.textContent = '¡Entrenamiento completado!';
-                    phaseDisplay.style.backgroundColor = '#4CD964';
-                    timerDisplay.textContent = '00:00';
-                    progressBar.style.width = '100%';
-                    nextPhaseDisplay.textContent = '';
-                    return;
-                }
+        <div class="rounds" id="rounds" aria-label="Progreso de los cuatro intervalos">
+          <div class="round" data-round="1">Intervalo 1</div>
+          <div class="round" data-round="2">Intervalo 2</div>
+          <div class="round" data-round="3">Intervalo 3</div>
+          <div class="round" data-round="4">Intervalo 4</div>
+        </div>
 
-                if (phaseTime <= 0) {
-                    if (currentPhase === 'Calentamiento') {
-                        currentPhase = 'Actividad intensa';
-                        phaseTime = 4 * 60;
-                        cycleCount++;
-                    } else if (currentPhase === 'Actividad intensa') {
-                        currentPhase = 'Recuperación';
-                        phaseTime = 3 * 60;
-                    } else if (currentPhase === 'Recuperación') {
-                        if (cycleCount < 3) {
-                            currentPhase = 'Actividad intensa';
-                            phaseTime = 4 * 60;
-                            cycleCount++;
-                        } else {
-                            currentPhase = 'Enfriamiento';
-                            phaseTime = cooldown * 60;
-                        }
-                    }
+        <div class="overall">
+          <div class="overall-meta">
+            <span id="elapsed-display">0:00 transcurridos</span>
+            <span id="remaining-display">40:00 restantes</span>
+          </div>
+          <div class="overall-track"><div id="overall-progress"></div></div>
+        </div>
 
-                    phaseOriginalTime = phaseTime;
-                }
+        <div class="next-card">
+          <div>
+            <span>Siguiente</span>
+            <strong id="next-phase">Intervalo 1 · 4:00</strong>
+          </div>
+          <div class="target" id="phase-target">Sube progresivamente<br>la intensidad</div>
+        </div>
 
-                const minutes = Math.floor(totalTime / 60);
-                const seconds = totalTime % 60;
-                phaseDisplay.textContent = `${currentPhase} (Ciclo ${cycleCount}/3)`;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        <div class="controls">
+          <button id="pause-workout" class="secondary" type="button">Pausar</button>
+          <button id="end-workout" class="secondary danger" type="button">Terminar</button>
+        </div>
+      </div>
+    </section>
 
-                // Update phase display color
-                switch (currentPhase) {
-                    case 'Calentamiento':
-                        phaseDisplay.style.backgroundColor = 'var(--warmup-color)';
-                        break;
-                    case 'Actividad intensa':
-                        phaseDisplay.style.backgroundColor = 'var(--interval-color)';
-                        break;
-                    case 'Recuperación':
-                        phaseDisplay.style.backgroundColor = 'var(--recovery-color)';
-                        break;
-                    case 'Enfriamiento':
-                        phaseDisplay.style.backgroundColor = 'var(--cooldown-color)';
-                        break;
-                }
+    <section id="complete-screen" class="hidden">
+      <div class="card complete-panel">
+        <div class="check">✓</div>
+        <h2>4×4 completado</h2>
+        <p id="complete-summary">40 minutos · 4 intervalos</p>
+        <button id="restart-workout" class="primary" type="button">Volver al inicio</button>
+      </div>
+    </section>
+  </main>
 
-                const progress = ((originalTotalTime - totalTime) / originalTotalTime) * 100;
-                progressBar.style.width = `${progress}%`;
-                progressBar.style.backgroundColor = phaseDisplay.style.backgroundColor;
+  <script>
+    const WORK_SECONDS = 4 * 60;
+    const RECOVERY_SECONDS = 3 * 60;
+    const WORK_ROUNDS = 4;
 
-                // Update next phase display
-                let nextPhase = '';
-                if (currentPhase === 'Calentamiento') nextPhase = 'Actividad intensa';
-                else if (currentPhase === 'Actividad intensa') nextPhase = 'Recuperación';
-                else if (currentPhase === 'Recuperación' && cycleCount < 3) nextPhase = 'Actividad intensa';
-                else if (currentPhase === 'Recuperación' && cycleCount === 3) nextPhase = 'Enfriamiento';
-                
-                if (nextPhase) {
-                    nextPhaseDisplay.textContent = `Siguiente: ${nextPhase}`;
-                } else {
-                    nextPhaseDisplay.textContent = '';
-                }
+    const setupScreen = document.getElementById('setup-screen');
+    const workoutScreen = document.getElementById('workout-screen');
+    const completeScreen = document.getElementById('complete-screen');
+    const warmupInput = document.getElementById('warmup');
+    const cooldownInput = document.getElementById('cooldown');
+    const totalDuration = document.getElementById('total-duration');
+    const startButton = document.getElementById('start-workout');
+    const pauseButton = document.getElementById('pause-workout');
+    const endButton = document.getElementById('end-workout');
+    const restartButton = document.getElementById('restart-workout');
 
-                totalTime--;
-                phaseTime--;
-            }
+    const phaseKicker = document.getElementById('phase-kicker');
+    const phaseName = document.getElementById('phase-name');
+    const phaseBadge = document.getElementById('phase-badge');
+    const timerDisplay = document.getElementById('timer-display');
+    const timerRing = document.getElementById('timer-ring');
+    const rounds = [...document.querySelectorAll('.round')];
+    const elapsedDisplay = document.getElementById('elapsed-display');
+    const remainingDisplay = document.getElementById('remaining-display');
+    const overallProgress = document.getElementById('overall-progress');
+    const nextPhase = document.getElementById('next-phase');
+    const phaseTarget = document.getElementById('phase-target');
+    const completeSummary = document.getElementById('complete-summary');
 
-            updateTimer();
-            const timer = setInterval(updateTimer, 1000);
-        });
-    </script>
+    let phases = [];
+    let phaseIndex = 0;
+    let phaseEndsAt = 0;
+    let pausedRemainingMs = 0;
+    let timerId = null;
+    let isPaused = false;
+    let totalWorkoutMs = 0;
+    let completedMsBeforePhase = 0;
+    let wakeLock = null;
+    let audioContext = null;
+    let lastCountdownSecond = null;
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    function readMinutes(input) {
+      const value = Number.parseInt(input.value, 10);
+      return Number.isFinite(value) ? clamp(value, 0, 30) : 0;
+    }
+
+    function formatTime(totalSeconds) {
+      const safe = Math.max(0, Math.ceil(totalSeconds));
+      const minutes = Math.floor(safe / 60);
+      const seconds = safe % 60;
+      return `${minutes}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function formatMinutes(totalSeconds) {
+      const minutes = totalSeconds / 60;
+      return Number.isInteger(minutes) ? `${minutes} min` : `${minutes.toFixed(1)} min`;
+    }
+
+    function buildPhases() {
+      const warmup = readMinutes(warmupInput) * 60;
+      const cooldown = readMinutes(cooldownInput) * 60;
+      const result = [];
+
+      if (warmup > 0) {
+        result.push({ type: 'warmup', label: 'Calentamiento', duration: warmup });
+      }
+
+      for (let round = 1; round <= WORK_ROUNDS; round++) {
+        result.push({ type: 'work', label: `Intervalo ${round}`, duration: WORK_SECONDS, round });
+        if (round < WORK_ROUNDS) {
+          result.push({ type: 'recovery', label: 'Recuperación activa', duration: RECOVERY_SECONDS, round });
+        }
+      }
+
+      if (cooldown > 0) {
+        result.push({ type: 'cooldown', label: 'Enfriamiento', duration: cooldown });
+      }
+
+      return result;
+    }
+
+    function updateTotalDuration() {
+      warmupInput.value = readMinutes(warmupInput);
+      cooldownInput.value = readMinutes(cooldownInput);
+      const totalSeconds = buildPhases().reduce((sum, phase) => sum + phase.duration, 0);
+      totalDuration.textContent = formatMinutes(totalSeconds);
+    }
+
+    document.querySelectorAll('[data-step]').forEach(button => {
+      button.addEventListener('click', () => {
+        const input = document.getElementById(button.dataset.step);
+        input.value = clamp(readMinutes(input) + Number(button.dataset.delta), 0, 30);
+        updateTotalDuration();
+      });
+    });
+
+    warmupInput.addEventListener('change', updateTotalDuration);
+    cooldownInput.addEventListener('change', updateTotalDuration);
+
+    function phaseColor(type) {
+      return {
+        warmup: getComputedStyle(document.documentElement).getPropertyValue('--warmup').trim(),
+        work: getComputedStyle(document.documentElement).getPropertyValue('--work').trim(),
+        recovery: getComputedStyle(document.documentElement).getPropertyValue('--recovery').trim(),
+        cooldown: getComputedStyle(document.documentElement).getPropertyValue('--cooldown').trim()
+      }[type];
+    }
+
+    function phaseInstruction(phase) {
+      switch (phase.type) {
+        case 'warmup': return 'Sube progresivamente<br>la intensidad';
+        case 'work': return 'Objetivo aprox.<br>85–95% FC máx';
+        case 'recovery': return 'Sigue en movimiento<br>y recupera';
+        case 'cooldown': return 'Baja el ritmo<br>progresivamente';
+        default: return '';
+      }
+    }
+
+    function currentPhase() {
+      return phases[phaseIndex];
+    }
+
+    function nextPhaseLabel() {
+      const next = phases[phaseIndex + 1];
+      if (!next) return 'Finalizar';
+      return `${next.label} · ${formatTime(next.duration)}`;
+    }
+
+    function updateRounds(phase) {
+      rounds.forEach(element => {
+        const round = Number(element.dataset.round);
+        element.classList.remove('current', 'complete');
+
+        if (phase.type === 'work') {
+          if (round < phase.round) element.classList.add('complete');
+          if (round === phase.round) element.classList.add('current');
+        } else if (phase.type === 'recovery') {
+          if (round <= phase.round) element.classList.add('complete');
+        } else if (phase.type === 'cooldown') {
+          element.classList.add('complete');
+        }
+      });
+    }
+
+    function completedBefore(index) {
+      return phases.slice(0, index).reduce((sum, phase) => sum + phase.duration * 1000, 0);
+    }
+
+    function renderPhaseStatic() {
+      const phase = currentPhase();
+      const accent = phaseColor(phase.type);
+      document.documentElement.style.setProperty('--accent', accent);
+
+      phaseKicker.textContent = phase.type === 'work'
+        ? `Trabajo · ${phase.round} de ${WORK_ROUNDS}`
+        : phase.type === 'recovery'
+          ? `Después del intervalo ${phase.round}`
+          : 'Ahora';
+      phaseName.textContent = phase.label;
+      phaseBadge.textContent = formatTime(phase.duration);
+      phaseTarget.innerHTML = phaseInstruction(phase);
+      nextPhase.textContent = nextPhaseLabel();
+      updateRounds(phase);
+    }
+
+    function renderTick(now = Date.now()) {
+      const phase = currentPhase();
+      if (!phase) return;
+
+      const remainingMs = isPaused ? pausedRemainingMs : Math.max(0, phaseEndsAt - now);
+      const phaseDurationMs = phase.duration * 1000;
+      const elapsedInPhaseMs = clamp(phaseDurationMs - remainingMs, 0, phaseDurationMs);
+      const phaseProgress = phaseDurationMs ? elapsedInPhaseMs / phaseDurationMs : 1;
+      const elapsedMs = completedMsBeforePhase + elapsedInPhaseMs;
+      const totalRemainingMs = Math.max(0, totalWorkoutMs - elapsedMs);
+
+      timerDisplay.textContent = formatTime(remainingMs / 1000);
+      timerRing.style.setProperty('--phase-progress', phaseProgress.toFixed(4));
+      overallProgress.style.width = `${Math.min(100, (elapsedMs / totalWorkoutMs) * 100)}%`;
+      elapsedDisplay.textContent = `${formatTime(elapsedMs / 1000)} transcurridos`;
+      remainingDisplay.textContent = `${formatTime(totalRemainingMs / 1000)} restantes`;
+
+      if (!isPaused) handleCountdownCue(remainingMs);
+    }
+
+    function handleCountdownCue(remainingMs) {
+      const second = Math.ceil(remainingMs / 1000);
+      if (second > 0 && second <= 3 && second !== lastCountdownSecond) {
+        lastCountdownSecond = second;
+        cue(second === 1 ? 720 : 560, second === 1 ? 110 : 70);
+        if ('vibrate' in navigator) navigator.vibrate(second === 1 ? 80 : 40);
+      }
+      if (second > 3) lastCountdownSecond = null;
+    }
+
+    function cue(frequency, durationMs) {
+      try {
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(.05, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + durationMs / 1000);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + durationMs / 1000);
+      } catch (_) {}
+    }
+
+    function beginPhase(index) {
+      phaseIndex = index;
+      completedMsBeforePhase = completedBefore(index);
+      const phase = currentPhase();
+      if (!phase) {
+        finishWorkout();
+        return;
+      }
+
+      lastCountdownSecond = null;
+      phaseEndsAt = Date.now() + phase.duration * 1000;
+      pausedRemainingMs = phase.duration * 1000;
+      renderPhaseStatic();
+      renderTick();
+      cue(phase.type === 'work' ? 760 : 430, 120);
+    }
+
+    function tick() {
+      if (isPaused || !currentPhase()) return;
+      const now = Date.now();
+      if (now >= phaseEndsAt) {
+        beginPhase(phaseIndex + 1);
+        return;
+      }
+      renderTick(now);
+    }
+
+    async function requestWakeLock() {
+      if (!('wakeLock' in navigator)) return;
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch (_) {}
+    }
+
+    async function releaseWakeLock() {
+      try { await wakeLock?.release(); } catch (_) {}
+      wakeLock = null;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !workoutScreen.classList.contains('hidden') && !isPaused) {
+        requestWakeLock();
+        renderTick();
+      }
+    });
+
+    startButton.addEventListener('click', () => {
+      phases = buildPhases();
+      totalWorkoutMs = phases.reduce((sum, phase) => sum + phase.duration * 1000, 0);
+      if (!phases.length) return;
+
+      setupScreen.classList.add('hidden');
+      completeScreen.classList.add('hidden');
+      workoutScreen.classList.remove('hidden');
+      isPaused = false;
+      pauseButton.textContent = 'Pausar';
+      clearInterval(timerId);
+      beginPhase(0);
+      timerId = window.setInterval(tick, 250);
+      requestWakeLock();
+    });
+
+    pauseButton.addEventListener('click', () => {
+      if (!currentPhase()) return;
+      if (!isPaused) {
+        pausedRemainingMs = Math.max(0, phaseEndsAt - Date.now());
+        isPaused = true;
+        pauseButton.textContent = 'Reanudar';
+        timerDisplay.style.opacity = '.55';
+        releaseWakeLock();
+      } else {
+        isPaused = false;
+        phaseEndsAt = Date.now() + pausedRemainingMs;
+        pauseButton.textContent = 'Pausar';
+        timerDisplay.style.opacity = '1';
+        requestWakeLock();
+      }
+      renderTick();
+    });
+
+    endButton.addEventListener('click', () => {
+      if (!window.confirm('¿Terminar el entrenamiento actual?')) return;
+      resetToSetup();
+    });
+
+    function finishWorkout() {
+      clearInterval(timerId);
+      timerId = null;
+      releaseWakeLock();
+      workoutScreen.classList.add('hidden');
+      completeScreen.classList.remove('hidden');
+      completeSummary.textContent = `${formatMinutes(totalWorkoutMs / 1000)} · 4 intervalos de trabajo`;
+      cue(880, 180);
+      if ('vibrate' in navigator) navigator.vibrate([80, 70, 120]);
+    }
+
+    function resetToSetup() {
+      clearInterval(timerId);
+      timerId = null;
+      releaseWakeLock();
+      isPaused = false;
+      phases = [];
+      workoutScreen.classList.add('hidden');
+      completeScreen.classList.add('hidden');
+      setupScreen.classList.remove('hidden');
+      timerDisplay.style.opacity = '1';
+      updateTotalDuration();
+    }
+
+    restartButton.addEventListener('click', resetToSetup);
+
+    updateTotalDuration();
+  </script>
 </body>
 </html>
